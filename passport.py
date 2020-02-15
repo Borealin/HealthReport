@@ -36,7 +36,7 @@ def login(s, userId, userPass):
 
 def getPass(s, filename):
     try:
-        with open('pass\\' + filename, "rb") as json_file:
+        with open('pass/' + filename, "rb") as json_file:
             userPass = json_file.read().decode()
             login(s, filename, userPass)
     except IOError:
@@ -51,7 +51,7 @@ def getPass(s, filename):
                 print('wrong password')
             else:
                 flag = False
-        with open('pass\\' + filename, "wb") as json_file:
+        with open('pass/' + filename, "wb") as json_file:
             json_file.write(userPass.encode())
     return requests.utils.dict_from_cookiejar(s.cookies)
 
