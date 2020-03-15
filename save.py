@@ -39,6 +39,7 @@ def getInfo(s, stuId):
     newInfo['city'] = oldInfo['city']
     newInfo['sfsqhzjkk'] = "1"
     newInfo['sqhzjkkys'] = "1"
+    newInfo['sfymqjczrj'] = "0"
     for key, value in newInfo.items():
         if isinstance(value, list):
             newInfo.pop(key)
