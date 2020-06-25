@@ -33,18 +33,14 @@ def getInfo(s, stuId):
     rawOldInfo = re.findall(r'oldInfo: (.*),', rawPage)[0]
     newInfo = json.loads(rawNewInfo)
     oldInfo = json.loads(rawOldInfo)
-    newInfo['address'] = oldInfo['address']
-    newInfo['area'] = oldInfo['area']
-    newInfo['province'] = oldInfo['province']
-    newInfo['city'] = oldInfo['city']
-    newInfo['sfsqhzjkk'] = "1"
-    newInfo['sqhzjkkys'] = "1"
-    newInfo['sfymqjczrj'] = "0"
+    oldInfo['created'] = newInfo['created']
+    oldInfo['uid'] = newInfo['uid']
+    oldInfo['id'] = newInfo['id']
+    oldInfo['date'] = newInfo['date']
     for key, value in newInfo.items():
         if isinstance(value, list):
-            newInfo.pop(key)
-            newInfo[key + '[]'] = value[0]
-    return newInfo
+            oldInfo[key+'[]'] = "0"
+    return oldInfo
 
 
 def postInfo(s, stuId):
