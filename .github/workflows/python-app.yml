@@ -30,6 +30,6 @@ jobs:
     - name: run health report python program
       run: python3 save.py
       env:
-          COOKIES: ${{ secrets.USER_JSON }}
-          SCT_SCENDKEY: ${{ secrets.SCT_SEND_KEY }}
+          USER_JSON: ${{ secrets.USER_JSON }}
+          SCT_SEND_KEY: ${{ secrets.SCT_SEND_KEY }}
           EMAIL: ${{ secrets.EMAIL }}
