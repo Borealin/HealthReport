@@ -3,6 +3,7 @@ import os
 import re
 import requests
 import datetime
+import time
 import traceback
 from typing import List
 
@@ -19,7 +20,7 @@ class HealthReport:
 
     def get_info(self) -> dict:
         cookies = self.user.login()
-        res = self.user.session.get(self.index_url, cookies=cookies)
+        res = self.user.session.get(self.index_url, cookies=cookies, timeout=10)
         res_text = res.text.replace('\n', ' ')
         raw_new_info = re.findall(r'var\s+def\s+=\s+({.*});\s+var\s+vm', res_text)[0]
         raw_new_info_ext_1 = re.findall(r'info:\s+\$\.extend\(\{(.+)\}\s*,\s*def', res_text)[0]
@@ -63,7 +64,7 @@ class HealthReport:
         try:
             info = self.get_info()
             # print(info)
-            res = self.user.session.post(self.save_url, data=info)
+            res = self.user.session.post(self.save_url, data=info, timeout=10)
             res_json = json.loads(res.text)
             if res_json['e'] == 0:
                 return self.user.user_id + ' submitted successfully'
@@ -110,5 +111,6 @@ if __name__ == '__main__':
     for user in get_user_from_env():
         report = HealthReport(user)
         push_msg = push_msg + report.save_info() + '\n'
+        time.sleep(10)
     print(push_msg)
     push(push_msg)
