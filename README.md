@@ -3,7 +3,7 @@
 ## 使用方法
 fork项目并通过项目Setting进行项目Secret的配置：
 
-![](md.asset\0.png)
+![0](md.asset/0.png)
 
 通过配置`USER_JSON`的secret变量进行用户的管理，通过如下json格式进行配置，可添加多个用户
 
@@ -11,11 +11,11 @@ fork项目并通过项目Setting进行项目Secret的配置：
 [{"name":"xxxx","pass":"xxxx"},{"name":"xxxx","pass":"xxxx"}]
 ```
 
-![](md.asset\1.png)
+![1](md.asset/1.png)
 
 配置好后进入项目的Github Action页面run workflow进行测试和第一次运行加载依赖等
 
-![](md.asset\2.png)
+![2](md.asset/2.png)
 
 运行成功后每天就会在凌晨的12:15进行自动打卡了
 
