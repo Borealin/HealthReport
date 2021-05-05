@@ -1,0 +1,18 @@
+
+image: python:latest
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+cache:
+  paths:
+    - .cache/pip
+    - venv/
+
+before_script:
+  - python -V
+  - if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+run:
+  script:
+    - python save.py
