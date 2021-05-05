@@ -33,7 +33,7 @@ on:
 
 ### Server酱
 
-通过Server酱官网注册并获取send key: https://sct.ftqq.com/，根据需求自行配置下发途径
+通过Server酱官网注册并获取send key: https://sct.ftqq.com/ ，根据需求自行配置下发途径
 
 在项目secret中配置`SCT_SEND_KEY`变量，值为用户send key
 
