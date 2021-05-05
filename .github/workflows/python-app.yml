@@ -33,3 +33,4 @@ jobs:
           USER_JSON: ${{ secrets.USER_JSON }}
           SCT_SEND_KEY: ${{ secrets.SCT_SEND_KEY }}
           EMAIL: ${{ secrets.EMAIL }}
+          EMAIL_TOKEN: ${{ secrets.EMAIL_TOKEN }}

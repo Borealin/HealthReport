@@ -86,18 +86,22 @@ def push(content):
     def sct(send_key, content_body):
         data = {"title": datetime.datetime.now().date().__str__() + "打卡结果", "desp": content_body}
         r = requests.post(f"https://sctapi.ftqq.com/{send_key}.send", data=data)
+        return r.text
 
-    def email(target, content_body):
-        data = {"title": datetime.datetime.now().date().__str__() + "打卡结果", "text": content_body, "to": target}
-        r = requests.post("https://email.berfen.com/api", data=data)
+    def email(token, target, content_body):
+        data = {"token": token, "title": datetime.datetime.now().date().__str__() + "打卡结果", "text": content_body,
+                "to": target}
+        r = requests.post("https://email.berfen.com/api.v2/", data=data)
+        return r.text
 
     sct_send_key: str = os.environ.get('SCT_SEND_KEY', None)
     if sct_send_key:
-        sct(sct_send_key, content)
+        print(sct(sct_send_key, content))
         print("已使用Server酱·Turbo版进行推送")
     email_target: str = os.environ.get('EMAIL', None)
-    if email_target:
-        email(email_target, content)
+    email_token: str = os.environ.get('EMAIL_TOKEN', None)
+    if email_target is not None and email_token is not None:
+        print(email(email_token, email_target, content))
         print("已使用邮箱推送")
 
 
