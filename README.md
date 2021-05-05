@@ -39,8 +39,8 @@ on:
 
 ## Email
 
-目前使用的是https://email.berfen.com/的email接口，需要注册账户并申请token（免费），
+目前使用的是https://email.berfen.com/ 的email接口，需要注册账户并申请token（免费），
 
 在项目secret中配置`EMAIL`变量，值为目标邮箱，配置`EMAIL_TOKEN`变量，值为上述网站token
 
-亦可自行配置github action，如https://github.com/dawidd6/action-send-mail，自行配置打卡结果输出至文件并通过smtp发送邮件
+亦可自行配置github action，如https://github.com/dawidd6/action-send-mail ，自行配置打卡结果输出至文件并通过smtp发送邮件
