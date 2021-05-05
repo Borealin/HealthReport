@@ -5,7 +5,7 @@ name: Health Report Auto Submission
 
 on:
   schedule:
-    - cron: '0 22,10 * * *'
+    - cron: '0 16 15 * *'
   workflow_dispatch:
 
 jobs:
@@ -13,10 +13,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python 3.9
+    - name: Set up Python 3.6
       uses: actions/setup-python@v2
       with:
-        python-version: 3.9
+        python-version: 3.6
     - uses: actions/caches@v2
       with:
         path: ~/.cache/pip
@@ -31,9 +31,6 @@ jobs:
     - name: run health report python program
       run: python3 save.py
       env:
-          COOKIES: ${{ secrets.COOKIES }}
-          SCT_SCENDKEY: ${{ secrets.SCT_SCENDKEY }}
+          COOKIES: ${{ secrets.USER_JSON }}
+          SCT_SCENDKEY: ${{ secrets.SCT_SEND_KEY }}
           EMAIL: ${{ secrets.EMAIL }}
-          TELEGRAM: ${{ secrets.TELEGRAM }}
-          WX_TEMPLATE: ${{ secrets.WX_TEMPLATE }}
-          WX_QY: ${{ secrets.WX_QY }}

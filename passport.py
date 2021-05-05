@@ -1,64 +1,54 @@
-import os
-
 import requests
 import json
-import rsaNoPadding
+from rsa_no_padding import Encrypt
 from bs4 import BeautifulSoup
 
-pubUrl = "https://zjuam.zju.edu.cn/cas/v2/getPubKey"
-passportUrl = "https://zjuam.zju.edu.cn/cas/login"
-loginUrl = "https://zjuam.zju.edu.cn/cas/login"
+
+class LoginFailedException(Exception):
+    def __init__(self, err='wrong user name or password'):
+        Exception.__init__(self, err)
 
 
-def passEncrypt(s, rawPass):
-    result = s.get(pubUrl)
-    rawJson = json.loads(result.text)
-    modulus = rawJson['modulus']
-    exponent = rawJson['exponent']
-    en = rsaNoPadding.Encrypt(exponent, modulus)
-    encrypted = en.encrypt(rawPass)
-    return encrypted
+class User:
+    base_url = "https://zjuam.zju.edu.cn/cas"
+    login_url = base_url + "/login"
+    pubkey_url = base_url + "/v2/getPubKey"
 
+    def __init__(self, user_id: str, user_pass: str, session: requests.Session = None):
+        self.user_id = user_id
+        self.user_pass = user_pass
+        if session is None:
+            self.session = requests.session()
+        else:
+            self.session = session
 
-def login(s, userId, userPass):
-    rawPage = s.get(passportUrl).text
-    soup = BeautifulSoup(rawPage, 'lxml')
-    executionId = soup.findAll('input', attrs={'name': 'execution'})[0]['value']
-    userPass = passEncrypt(s, userPass)
-    form = {'username': userId,
-            'password': userPass,
-            'authcode': '',
-            'execution': executionId,
-            '_eventId': 'submit'}
-    result = s.post(loginUrl, data=form)
-    return result
+    def login(self) -> dict:
+        page_text = self.session.get(self.login_url).text
+        soup = BeautifulSoup(page_text, 'lxml')
+        execution_id = soup.findAll('input', attrs={'name': 'execution'})[0]['value']
+        enc_user_pass = self.pass_encrypt(self.user_pass)
+        form = {'username': self.user_id,
+                'password': enc_user_pass,
+                'authcode': '',
+                'execution': execution_id,
+                '_eventId': 'submit'}
+        self.session.post(self.login_url, data=form)
+        cookies = requests.utils.dict_from_cookiejar(self.session.cookies)
+        if 'iPlanetDirectoryPro' not in cookies:
+            raise LoginFailedException
+        else:
+            if 'JSESSIONID' in cookies:
+                del cookies['JSESSIONID']
+            if 'route' in cookies:
+                del cookies['route']
+            return cookies
 
+    def pass_encrypt(self, raw_pass: str) -> str:
+        result = self.session.get(self.pubkey_url)
+        res_json = json.loads(result.text)
+        modulus = res_json['modulus']
+        exponent = res_json['exponent']
+        en = Encrypt(exponent, modulus)
+        encrypted = en.encrypt(raw_pass)
+        return encrypted
 
-def getPass(s, filename):
-    try:
-        with open('pass/' + filename, "rb") as json_file:
-            userPass = json_file.read().decode()
-            login(s, filename, userPass)
-    except IOError:
-        flag = True
-        print(filename, '\'s password not generated ')
-        userPass = ''
-        while flag:
-            userPass = str(input('please input password '))
-            res = login(s, filename, userPass)
-            cookieList = requests.utils.dict_from_cookiejar(res.cookies)
-            if len(cookieList) > 0:
-                print('wrong password')
-            else:
-                flag = False
-        with open('pass/' + filename, "wb") as json_file:
-            json_file.write(userPass.encode())
-    return requests.utils.dict_from_cookiejar(s.cookies)
-
-
-if __name__ == '__main__':
-    if not os.path.exists('pass'):
-        os.mkdir('pass')
-    session = requests.session()
-    stuId = str(input('please input stuId you want to add '))
-    print(getPass(session, stuId))

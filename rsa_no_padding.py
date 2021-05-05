@@ -1,11 +1,12 @@
 import rsa
 
-class Encrypt(object):
-    def __init__(self,e,m):
+
+class Encrypt:
+    def __init__(self, e, m):
         self.e = e
         self.m = m
 
-    def encrypt(self,message):
+    def encrypt(self, message):
         mm = int(self.m, 16)
         ee = int(self.e, 16)
         rsa_pubkey = rsa.PublicKey(mm, ee)
@@ -13,8 +14,6 @@ class Encrypt(object):
         return crypto.hex()
 
     def _pad_for_encryption(self, message, target_length):
-        # message = message[::-1]
-        max_msglength = target_length - 11
         msglength = len(message)
 
         padding = b''
@@ -23,7 +22,7 @@ class Encrypt(object):
         for i in range(padding_length):
             padding += b'\x00'
 
-        return b''.join([b'\x00\x00',padding,b'\x00',message])
+        return b''.join([b'\x00\x00', padding, b'\x00', message])
 
     def _encrypt(self, message, pub_key):
         keylength = rsa.common.byte_size(pub_key.n)
@@ -34,7 +33,3 @@ class Encrypt(object):
         block = rsa.transform.int2bytes(encrypted, keylength)
 
         return block
-
-if __name__ =='__main__':
-    en = Encrypt(e,m)
-    print(en.encrypt(message))
