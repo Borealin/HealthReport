@@ -5,7 +5,7 @@ name: Health Report Auto Submission
 
 on:
   schedule:
-    - cron: '28,32,36 * * * *'
+    - cron: '15 16 * * *'
   workflow_dispatch:
 
 jobs:
