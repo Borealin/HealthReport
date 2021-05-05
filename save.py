@@ -62,7 +62,7 @@ class HealthReport:
     def save_info(self) -> str:
         try:
             info = self.get_info()
-            print(info)
+            # print(info)
             res = self.user.session.post(self.save_url, data=info)
             res_json = json.loads(res.text)
             if res_json['e'] == 0:
@@ -102,6 +102,9 @@ def push(content):
 
 
 if __name__ == '__main__':
+    push_msg = ''
     for user in get_user_from_env():
         report = HealthReport(user)
-        print(report.save_info())
+        push_msg = push_msg + report.save_info() + '\n'
+    print(push_msg)
+    push(push_msg)
