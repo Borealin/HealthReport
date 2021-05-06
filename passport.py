@@ -26,7 +26,7 @@ class User:
     def login(self) -> dict:
         try:
             page_text = self.session.get(
-                self.base_url + self.login_url, allow_redirects=False, timeout=20, verify=False).text
+                self.base_url + self.login_url, allow_redirects=False, timeout=20).text
         except Exception as e:
             page_text = self.session.get(
                 self.fallback_base_url + self.login_url, allow_redirects=False, timeout=20, verify=False).text
@@ -41,7 +41,7 @@ class User:
                 '_eventId': 'submit'}
         try:
             self.session.post(self.base_url + self.login_url, data=form,
-                              allow_redirects=False, timeout=20, verify=False)
+                              allow_redirects=False, timeout=20)
         except Exception as e:
             self.session.post(self.fallback_base_url + self.login_url, data=form,
                               allow_redirects=False, timeout=20, verify=False)
@@ -58,7 +58,7 @@ class User:
     def pass_encrypt(self, raw_pass: str) -> str:
         try:
             result = self.session.get(
-                self.base_url + self.pubkey_url, allow_redirects=False, timeout=20, verify=False)
+                self.base_url + self.pubkey_url, allow_redirects=False, timeout=20)
         except Exception as e:
             result = self.session.get(
                 self.fallback_base_url + self.pubkey_url, allow_redirects=False, timeout=20, verify=False)

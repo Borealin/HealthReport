@@ -5,6 +5,7 @@ import requests
 import datetime
 import time
 import traceback
+import pytz
 from typing import List
 
 from passport import User
@@ -85,12 +86,12 @@ def get_user_from_env() -> List[User]:
 
 def push(content):
     def sct(send_key, content_body):
-        data = {"title": datetime.datetime.now().date().__str__() + "打卡结果", "desp": content_body}
+        data = {"title": datetime.datetime.now(pytz.timezone('Asia/Shanghai')).date().__str__() + "打卡结果", "desp": content_body}
         r = requests.post(f"https://sctapi.ftqq.com/{send_key}.send", data=data)
         return r.text
 
     def email(token, target, content_body):
-        data = {"token": token, "title": datetime.datetime.now().date().__str__() + "打卡结果", "text": content_body,
+        data = {"token": token, "title": datetime.datetime.now(pytz.timezone('Asia/Shanghai')).date().__str__() + "打卡结果", "text": content_body,
                 "to": target}
         r = requests.post("https://email.berfen.com/api.v2/", data=data)
         return r.text
