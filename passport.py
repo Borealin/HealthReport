@@ -10,7 +10,7 @@ class LoginFailedException(Exception):
 
 
 class User:
-    base_url = "https://zjuam.zju.edu.cn/cas"
+    base_url = "http://zjuam.zju.edu.cn/cas"
     login_url = base_url + "/login"
     pubkey_url = base_url + "/v2/getPubKey"
 
@@ -23,7 +23,7 @@ class User:
             self.session = session
 
     def login(self) -> dict:
-        page_text = self.session.get(self.login_url, allow_redirects=False, timeout=20).text
+        page_text = self.session.get(self.login_url, allow_redirects=False, timeout=20, verify=False).text
         soup = BeautifulSoup(page_text, 'lxml')
         execution_id = soup.findAll('input', attrs={'name': 'execution'})[0]['value']
         enc_user_pass = self.pass_encrypt(self.user_pass)
@@ -32,7 +32,7 @@ class User:
                 'authcode': '',
                 'execution': execution_id,
                 '_eventId': 'submit'}
-        self.session.post(self.login_url, data=form, allow_redirects=False, timeout=20)
+        self.session.post(self.login_url, data=form, allow_redirects=False, timeout=20, verify=False)
         cookies = requests.utils.dict_from_cookiejar(self.session.cookies)
         if 'iPlanetDirectoryPro' not in cookies:
             raise LoginFailedException
@@ -44,7 +44,7 @@ class User:
             return cookies
 
     def pass_encrypt(self, raw_pass: str) -> str:
-        result = self.session.get(self.pubkey_url, allow_redirects=False, timeout=20)
+        result = self.session.get(self.pubkey_url, allow_redirects=False, timeout=20, verify=False)
         res_json = json.loads(result.text)
         modulus = res_json['modulus']
         exponent = res_json['exponent']
