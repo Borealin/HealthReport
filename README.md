@@ -37,7 +37,7 @@ on:
 
 在项目secret中配置`SCT_SEND_KEY`变量，值为用户send key
 
-## Email
+### Email
 
 目前使用的是https://email.berfen.com/ 的email接口，需要注册账户并申请token（免费），
 
