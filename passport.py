@@ -10,9 +10,10 @@ class LoginFailedException(Exception):
 
 
 class User:
-    base_url = "http://zjuam.zju.edu.cn/cas"
-    login_url = base_url + "/login"
-    pubkey_url = base_url + "/v2/getPubKey"
+    base_url = 'https://zjuam.zju.edu.cn/cas'
+    fallback_base_url = 'http://210.32.15.40/cas'
+    login_url = '/login'
+    pubkey_url = '/v2/getPubKey'
 
     def __init__(self, user_id: str, user_pass: str, session: requests.Session = None):
         self.user_id = user_id
@@ -23,16 +24,27 @@ class User:
             self.session = session
 
     def login(self) -> dict:
-        page_text = self.session.get(self.login_url, allow_redirects=False, timeout=20, verify=False).text
+        try:
+            page_text = self.session.get(
+                self.base_url + self.login_url, allow_redirects=False, timeout=20, verify=False).text
+        except Exception as e:
+            page_text = self.session.get(
+                self.fallback_base_url + self.login_url, allow_redirects=False, timeout=20, verify=False).text
         soup = BeautifulSoup(page_text, 'lxml')
-        execution_id = soup.findAll('input', attrs={'name': 'execution'})[0]['value']
+        execution_id = soup.findAll(
+            'input', attrs={'name': 'execution'})[0]['value']
         enc_user_pass = self.pass_encrypt(self.user_pass)
         form = {'username': self.user_id,
                 'password': enc_user_pass,
                 'authcode': '',
                 'execution': execution_id,
                 '_eventId': 'submit'}
-        self.session.post(self.login_url, data=form, allow_redirects=False, timeout=20, verify=False)
+        try:
+            self.session.post(self.base_url + self.login_url, data=form,
+                              allow_redirects=False, timeout=20, verify=False)
+        except Exception as e:
+            self.session.post(self.fallback_base_url + self.login_url, data=form,
+                              allow_redirects=False, timeout=20, verify=False)
         cookies = requests.utils.dict_from_cookiejar(self.session.cookies)
         if 'iPlanetDirectoryPro' not in cookies:
             raise LoginFailedException
@@ -44,7 +56,12 @@ class User:
             return cookies
 
     def pass_encrypt(self, raw_pass: str) -> str:
-        result = self.session.get(self.pubkey_url, allow_redirects=False, timeout=20, verify=False)
+        try:
+            result = self.session.get(
+                self.base_url + self.pubkey_url, allow_redirects=False, timeout=20, verify=False)
+        except Exception as e:
+            result = self.session.get(
+                self.fallback_base_url + self.pubkey_url, allow_redirects=False, timeout=20, verify=False)
         res_json = json.loads(result.text)
         modulus = res_json['modulus']
         exponent = res_json['exponent']
