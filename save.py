@@ -1,4 +1,5 @@
 import json
+from json.decoder import JSONDecodeError
 import os
 import re
 import requests
@@ -31,7 +32,13 @@ class HealthReport:
         raw_new_info_ext_1 = re.findall(r'info:\s+\$\.extend\(\{(.+)\}\s*,\s*def', res_text)[0]
         raw_new_info_ext_2 = re.findall(r'def\s*,\s*\{(.*)\}\)\s*,\s*oldInfo', res_text)[0]
         raw_old_info = re.findall(r'oldInfo: (.*),.+tipMsg', res_text)[0]
-        new_info = json.loads(raw_new_info)
+        try:
+            new_info = json.loads(raw_new_info)
+        except JSONDecodeError as e:
+            new_info = dict(filter(lambda x: len(x) == 2,
+                                     [tuple(i.replace(' ', '').replace('\'', '').split(':')) for i in
+                                      raw_new_info.split(',')]))
+            new_info['geo_api_info'] = "{\"type\":\"complete\",\"info\":\"SUCCESS\",\"status\":1,\"cEa\":\"jsonp_630595_\",\"position\":{\"Q\":30.263776,\"R\":120.122946,\"lng\":120.122946,\"lat\":30.263776},\"message\":\"Get ipLocation success.Get address success.\",\"location_type\":\"ip\",\"accuracy\":null,\"isConverted\":true,\"addressComponent\":{\"citycode\":\"0571\",\"adcode\":\"330110\",\"businessAreas\":[],\"neighborhoodType\":\"\",\"neighborhood\":\"\",\"building\":\"\",\"buildingType\":\"\",\"street\":\"浙大路\",\"streetNumber\":\"38号\",\"country\":\"中国\",\"province\":\"浙江省\",\"city\":\"杭州市\",\"district\":\"西湖区\",\"township\":\"灵隐街道\"},\"formattedAddress\":\"浙江省杭州市西湖区灵隐街道浙江大学玉泉校区\",\"roads\":[],\"crosses\":[],\"pois\":[]}"
         new_info_ext_1 = dict(filter(lambda x: len(x) == 2,
                                      [tuple(i.replace(' ', '').replace('\'', '').split(':')) for i in
                                       raw_new_info_ext_1.split(',')]))
